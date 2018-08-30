@@ -4,6 +4,7 @@ MATCASC is an open source MATLAB based tool to analyse cascading failures in pow
 As a starting point you may use:
 
 **SimCascFailures.m** is the file to simulate a cascading line overloads.
+
 **QuantifyDamageByCascades.m** is the main file that simulates and also quantifies the cascades. 
 
 Mathower needs to be installed for the code to work:
