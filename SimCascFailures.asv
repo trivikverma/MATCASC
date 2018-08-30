@@ -1,0 +1,88 @@
+function [flowStageResult] = SimCascFailures(casedata, alpha, removalStrategy)
+% This m-file is used to simulate cascading failures in a given power grid.
+% Input:        lineToFail= index of line to be attacked/overoaded in vector form: [r c]
+%               alpha=tolerance parameter of the network
+%               
+
+mpc = casedata;
+if issexists(mpc.areas)
+mpc = rmfield(mpc, 'areas');
+mpc = rmfield(mpc, 'gencost');
+overload = 1;
+
+% Obtain initial flow matrix
+[flowMatrixInitial, ~, ~, ~, slackPower] = PerformDcLoadFlowAnalysis(mpc);
+% Calibrate mpc with slack node power: insert slack power to slack node generation entry
+mpc.gen(1,2) = slackPower;
+% Compute capacity matrix
+[capMatrix] = GetCapacityMatrix(flowMatrixInitial, alpha);  
+% Determine line-to-be-attacked 
+[lineThreat] = GetLineThreat(flowMatrixInitial, removalStrategy);          
+
+%% Initialisation
+
+currentSetOfIslands(1).island = ext2int(mpc);
+currentSetOfIslands(1).flowMatrix = flowMatrixInitial;
+currentSetOfIslands(1).capacityMatrix = capMatrix;
+currentSetOfIslands(1).lineThreat = lineThreat;
+currentSetOfIslands(1).overloaded = 1;
+
+%% Redistribution of Loads
+%If there is overloading
+itr = 1;
+flowStageResult{1,itr} = currentSetOfIslands;
+while overload == 1,
+    itr = itr + 1;
+    
+    % Start of each flow redistribution round
+    
+    [~, numberOfIslands] = size(currentSetOfIslands);
+    %Clear use of temp struct
+    clear intermediateSetOfIslands;
+    intermediateSetOfIslands(1) = currentSetOfIslands(1); %Dummy value
+   
+    %For each Island
+    overload = 0;
+    for k = 1 : numberOfIslands,
+       
+        %If there are any overloaded links
+        %Distribute flow
+        if currentSetOfIslands(k).overloaded == 1   
+            [nextSetOfIslands, islandStatus] =...
+                distribute_flow(currentSetOfIslands(k));
+            %If still connected
+            %Still possibility of overload
+            if islandStatus == 1
+                overload = 1;
+            end
+        %If no overloaded links
+        else
+            %Transfer island from one step to the next (unchanged)
+            nextSetOfIslands = currentSetOfIslands(k);
+        end
+        
+        %Combine all indexThreats and nextSetOfIslands from one redistribution phase
+        intermediateSetOfIslands = [intermediateSetOfIslands nextSetOfIslands];
+        
+    end
+    
+    %Deleting dummy
+    intermediateSetOfIslands(1) = [];
+    
+    %For next phase
+    currentSetOfIslands = intermediateSetOfIslands;
+    if isempty(currentSetOfIslands)
+        overload = 0;
+    end
+    
+    flowStageResult{1,itr} = currentSetOfIslands; %End of each round
+
+end
+
+end
+
+
+     
+     
+         
+

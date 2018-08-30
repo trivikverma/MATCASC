@@ -1,0 +1,9 @@
+function [ indexThreat ] = unmaskThreatenedNodes( indexThreat, mask )
+%UnMask the threatened nodes so they correspond to the main island ordering
+%externally
+
+%Find rows that contain threatened nodes as original values    
+uniqueIndexThreat = unique(indexThreat);
+unmaskedIndexThreat = mask(uniqueIndexThreat,1);
+
+end
