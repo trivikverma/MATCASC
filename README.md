@@ -12,3 +12,7 @@ http://www.pserc.cornell.edu/matpower/
 
 **NOTE**
 Due to a redistribution of roles and teams, and alternate career choices, none of the team members of this project will be able to provide support. However, you may feel free to contact Trivik Verma (vtrivik at ethz.ch) anytime for further information. He will try his best to get back to you in good time. 
+
+
+If you use this code and/ or any research arising from it, kindly cite this article:
+Koc, Y., Verma, T., Araujo, N. A., & Warnier, M. (2013, November). Matcasc: A tool to analyse cascading line outages in power grids. In Intelligent Energy Systems (IWIES), 2013 IEEE International Workshop (pp. 143-148). IEEE.
